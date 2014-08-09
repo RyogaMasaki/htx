@@ -1,9 +1,9 @@
 // htX - hypertext transfer - a simple wrapper for XmlHttpRequest
-// 2014.07.06 Damian Rogers (damian@sudden-desu.net)
+// ver 0.1 - 2014 July - Damian Rogers (damian@sudden-desu.net)
 
 var htx=(function(){
-  function submitAsync(req,opts) {
-    
+
+  function submitAsync(req,opts) {    
 	  req.onreadystatechange=function() {
 	    if(req.readyState==4) complete(req,opts);
     };
@@ -20,7 +20,6 @@ var htx=(function(){
     
     // check the object type and ONLY flatten non-special objects
     if(opts.data) {
-      //if(typeof(opts.data)=='object') {
       if(//!opts.data instanceof ArrayBufferView ||
          !opts.data instanceof Blob ||
          !opts.data instanceof Document ||
@@ -81,25 +80,18 @@ var htx=(function(){
   function complete(req,opts) {
     if(req.status==200) {
       try {
-        
-        //if(req.getResponseHeader('Content-type')=='application/json' || opts.overrideMimeType=='application/json') req.responseJSON=JSON.parse(req.responseText);
         if(req.getResponseHeader('Content-type')=='application/json' || opts.responseType=='json') req.responseJSON=JSON.parse(req.responseText);
       }
       catch(e) {
         //error with the JSON parse
-        //opts.error('Error during JSON parse: '+e.message,req);
         req.responseJSON=null;
       }
-      //console.log(req.responseJSON && (opts.overrideMimeType=='application/json'));
-      //console.log(opts.overrideMimeType=='application/json');
       
+      //change the default return value depending on the specified MIME type or the expected response type, and if the JSON was parsed successfully
       if(
         (opts.overrideMimeType=='application/json' ||
-         //opts.responseType==null ||
          opts.responseType=='json')
          && req.responseJSON) opts.success(req.responseJSON,req);
-      //if((req.responseJSON && !opts.overrideMimeType)) opts.success(req.responseJSON,req);
-      //if(req.responseJSON) opts.success(req.responseJSON,req);
       else opts.success(req.response,req);
     }
     else opts.error('HTTP status not OK',req);
